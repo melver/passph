@@ -25,7 +25,7 @@ Usage
 
 .. code-block::
 
-    usage: passph.py [-h] [-c] [-p] [-u URL] [-i C] [-l CHARS] [-e]
+    usage: passph.py [-h] [-c] [-p] [-u URL] [-i C] [-l CHARS] [-A] [-e]
                      [--show-entropy] [-v]
 
     Password Pre-Hasher: Use at your own risk! By default the program does NOT
@@ -40,6 +40,8 @@ Usage
       -i C, --iterations C  Iterations of PBKDF2. [Default: 8000]
       -l CHARS, --length CHARS
                             Length of result. [Default: 25]
+      -A, --alt-charlist    Use alternative charlist, from either environment
+                            variable PASSPH_CHARLIST or a preset builtin.
       -e, --echo            Echo passwords/passphrases.
       --show-entropy        Show estimated output password entropy.
       -v, --version         show program's version number and exit

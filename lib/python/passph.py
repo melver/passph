@@ -231,23 +231,23 @@ def estimate_entropy(pwlen):
     return pwlen * math.log(len(frozenset(default_charlist)), 2)
 
 def get_args_cmdline(argv):
-    parser = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(prog="passph",
             description="Password Pre-Hasher: Use at your own risk!\n"\
                         "By default the program does NOT output anything, "\
                         "please choose from available options.")
     parser.add_argument("-c", "--clip", action="store_true",
             dest="do_clip", default=False,
-            help="Copy result to available clipboard.")
+            help="Copy output to clipboard.")
     parser.add_argument("-p", "--print", action="store_true",
             dest="do_print", default=False,
-            help="Print to stdout.")
+            help="Print output to stdout.")
     parser.add_argument("-u", "--salt-url", metavar="URL", type=str,
             dest="salt_url", default=None,
             help="Use contents at URL as salt.")
     parser.add_argument("-i", "--iterations", metavar="C", type=int,
             dest="iterations", default=8000,
             help="Iterations of PBKDF2. [Default: 8000]")
-    parser.add_argument("-l", "--length", metavar="CHARS", type=int,
+    parser.add_argument("-l", "--length", metavar="LEN", type=int,
             dest="len_chars", default=25,
             help="Length of result. [Default: 25]")
     parser.add_argument("-A", "--alt-charlist", action="store_true",

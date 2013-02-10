@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# bin/passph: Wrapper for main program.
+#
+# Author: Marco Elver <me AT marcoelver.com>
+
+PASSPH_ROOT="$(cd "${0%/*}/.." && pwd)"
+PYTHONPATH="${PYTHONPATH}:${PASSPH_ROOT}/lib/python"
+
+export PYTHONPATH
+
+exec "${PASSPH_ROOT}/lib/python/passph.py" "$@"
+

@@ -50,10 +50,13 @@
 #   - Optional: xclip for copying to the clipboard on systems with X.
 #   - Optional: SL4A Python for use on Android platform.
 #
+# Test with both passphrases empty, and default settings should yield:
+#   v,Ddmn!2/Lc[*adw*tcw!5zaK
+#
 # @author Marco Elver <me AT marcoelver.com>
 #
 
-__version__ = "20130130"
+__version__ = "20130210"
 
 import sys
 import os
@@ -129,7 +132,9 @@ DIGEST = hashlib.sha512
 #
 CHARLIST = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" \
            "--__==++;;::,,..!!<<>>##**(()){{}}[[]]@@??%%&&//0123456789abcdABCD"
+ALT_CHARLIST = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ42"
 PAD_CHAR = "$"
+default_charlist = CHARLIST
 
 def base_charlist_encode(data, charlist):
     """
@@ -213,17 +218,17 @@ def pre_hash(masterpw, password, args):
                 else:
                     break
 
-    key_len = int(math.ceil((math.log(len(CHARLIST), 2) * args.len_chars) / 8))
+    key_len = int(math.ceil((math.log(len(default_charlist), 2) * args.len_chars) / 8))
     key = pbkdf2(password, salt_hasher.digest(),
                  iter_count=args.iterations, dk_len=key_len,
                  digest=DIGEST)
-    return base_charlist_encode(key, CHARLIST)
+    return base_charlist_encode(key, default_charlist)
 
 def estimate_entropy(pwlen):
     """
     Estimate password entropy for pre_hash output with given length.
     """
-    return pwlen * math.log(len(frozenset(CHARLIST)), 2)
+    return pwlen * math.log(len(frozenset(default_charlist)), 2)
 
 def get_args_cmdline(argv):
     parser = argparse.ArgumentParser(
@@ -245,6 +250,9 @@ def get_args_cmdline(argv):
     parser.add_argument("-l", "--length", metavar="CHARS", type=int,
             dest="len_chars", default=25,
             help="Length of result. [Default: 25]")
+    parser.add_argument("-A", "--alt-charlist", action="store_true",
+            dest="alt_charlist", default=False,
+            help="Use alternative charlist, from either environment variable PASSPH_CHARLIST or a preset builtin.")
     parser.add_argument("-e", "--echo", action="store_true",
             dest="echo", default=False,
             help="Echo passwords/passphrases.")
@@ -264,6 +272,7 @@ def get_args_json(argv):
             self.salt_url = None
             self.iterations = 8000
             self.len_chars = 25
+            self.alt_charlist = False
             self.echo = False
             self.show_entropy = False
 
@@ -308,6 +317,15 @@ def main(argv):
 
     if args.echo: pw_input = input
     else:         pw_input = getpass
+
+    if args.alt_charlist:
+        global default_charlist
+        if "PASSPH_CHARLIST" in os.environ:
+            print("[INFO] Using charlist from environment variable PASSPH_CHARLIST")
+            default_charlist = os.environ["PASSPH_CHARLIST"]
+        else:
+            print("[INFO] Using alternative builtin charlist")
+            default_charlist = ALT_CHARLIST
 
     result = pre_hash(
                 pw_input("[1/2] Enter master password/passphrase: ").encode(),
